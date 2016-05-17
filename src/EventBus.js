@@ -77,11 +77,9 @@ Namespace("KL");
 			try {
 				handler.apply(thisArg, args);
 			} catch (error) {
-				if (__errorHandler && KL.Helpers.isFunction(__errorHandler)) {
-					args.unshift(error);
-					args.unshift(event);					
+				if (__errorHandler && KL.Helpers.isFunction(__errorHandler)) {	
 					try {
-						__errorHandler.apply(thisArg, args);
+						__errorHandler.apply(thisArg, args.unshift(error).unshift(event));
 					} catch (error) {
 						// Если совсем всё плохо у клиента, 
 						//внутренний код это не должно затрагивать
@@ -89,23 +87,29 @@ Namespace("KL");
 				}
 			}
 		},
-		trigger: function(event, thisArg){
-			var args = __imp.getArgsFrom(arguments, 2);
-			args.unshift(__eventData);
-			
+		triggerInner: function(event, thisArg, args){
 			var handlers = __events[event.toLowerCase()];
 			if (handlers) {
 				for (var i = 0, handler; handler = handlers[i]; ++i) {
 					(function (h) {
 						__imp.executeSafe(event, h, thisArg, args);
 					})(handler); //loop scope issue
-
 				}
 			}
+		},
+		trigger: function(event, thisArg){
+			var args = __imp.getArgsFrom(arguments, 2).unshift(__eventData);
+			__imp.triggerInner(event, thisArg, args);			
+			return KL.EventBus;
+		},
+		triggerAsync: function(event, thisArg, duration){
+			var args = __imp.getArgsFrom(arguments, 3).unshift(__eventData);
+			setTimeout(function(){
+				__imp.triggerInner(event, thisArg, args);
+			}, duration || 1);
 			return KL.EventBus;
 		}
 	}
-	
 	
 	/*Public interface*/
 	KL.EventBus = {
@@ -138,6 +142,14 @@ Namespace("KL");
 		* @returns {KL.EventBus}
 		*/
 		trigger: __imp.trigger,
+		/*
+		* Вызов события "асинхронно".
+		* @param {string} name - название события.
+		* @param {object} thisArg - объект, инициировавший событие.
+		* @param {any} args - дополнительные параметры, которые необходимо передать в обработчик события.
+		* @returns {KL.EventBus}
+		*/
+		triggerAsync: __imp.triggerAsync,
 		
 		/*
 		* Обработчик исключения, возникшего в обработчике события.
@@ -147,7 +159,7 @@ Namespace("KL");
 		* @param {any} args - данные события, переданные в метод trigger.
 		* @returns {void}
 		*/
-		handleError: __imp.addHandleError
+		error: __imp.addHandleError
 	};
 	
 })(jQuery);
