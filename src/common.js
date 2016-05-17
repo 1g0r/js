@@ -1,6 +1,7 @@
 function Namespace(name) {
 	if (typeof name == "string" && name.length > 0) {
 		_buildNamespace(window, name.split('.'));
+		return _buildNamespace.last;
 	}
 }
 
@@ -10,11 +11,12 @@ function _buildNamespace(obj, tail) {
 		if (!obj[name]) {
 			obj[name] = {}
 		}
-		_buildNamespace(obj[name], tail);
+		_buildNamespace.call(obj[name], obj[name], tail);
+	} else {
+		_buildNamespace.last = this;
 	}
 }
 
-Namespace("App.Helpers");
 (function (hel) {
 	hel.getDefaults = function (settings, defaults) {
 		if (!this.isObject(defaults)) {
@@ -38,6 +40,12 @@ Namespace("App.Helpers");
 	};
 	hel.isObject = function (obj) {
 		return obj && typeof obj == "object";
+	};
+	hel.to$ = function (el) {
+		if (el instanceof jQuery) {
+			return el;
+		}
+		return $(el);
 	};
 	hel.isString = function (str) {
 		return typeof str === "string";
@@ -66,45 +74,61 @@ Namespace("App.Helpers");
 		} 
 		return [];
 	};
-})(App.Helpers);
+})(Namespace("KL.Helpers"));
 
-Namespace("App.Logger");
 (function (ns) {
 	ns.log = function () {
 		if (console) {
-			console.log.apply(console, App.Helpers.toArray(arguments));
+			console.log.apply(console, KL.Helpers.toArray(arguments));
 		}
 	};
 	ns.info = function() {
 		if (console) {
-			console.info.apply(console, App.Helpers.toArray(arguments));
+			console.info.apply(console, KL.Helpers.toArray(arguments));
 		}
 	};
 	ns.warn = function() {
 		if (console) {
-			console.warn.apply(console, App.Helpers.toArray(arguments));
+			console.warn.apply(console, KL.Helpers.toArray(arguments));
 		}
 	};
 	ns.error = function() {
 		if (console) {
-			console.error.apply(console, App.Helpers.toArray(arguments));
+			console.error.apply(console, KL.Helpers.toArray(arguments));
 		}
 	};
 	ns.assert = function() {
 		if (console) {
-			console.assert.apply(console, App.Helpers.toArray(arguments));
+			console.assert.apply(console, KL.Helpers.toArray(arguments));
 		}
 	};
 
-})(App.Logger);
+})(Namespace("KL.Logger"));
+
+(function ($) {
+	$.fn.hasAttr = function (name) {
+		return KL.Helpers.isDefined(this.attr(name));
+	}
+})(jQuery);
+
+(function ($) {
+	$.fn.appendTimeZone = function (name) {
+		if (this.length > 0 && this[0].tagName.toLowerCase() === "form") {
+			var timeZone = (new Date().getTimezoneOffset()) / 60;
+			this.append($('<input>').attr('type', 'hidden')
+				.attr('name', name).val(timeZone * -1));
+		}
+		return this;
+	}
+})(jQuery);
 
 (function () {
 	String.prototype.format = function () {
-		var args = App.Helpers.toArray(arguments);
+		var args = KL.Helpers.toArray(arguments);
 		if (args.length === 0) {
 			return this;
 		}
-		if (args.length === 1 && App.Helpers.isArray(args[0])) {
+		if (args.length === 1 && KL.Helpers.isArray(args[0])) {
 			args = args[0];
 		}
 		var result = this;
@@ -117,15 +141,40 @@ Namespace("App.Logger");
 
 	String.prototype.isEmpty = function () {
 		return this.length === 0;
-	}
+	};
+	
+	Array.prototype.unshift = (function(){
+		var base = Array.prototype.unshift;
+		return function(){
+			base.apply(this, arguments);
+			return this;
+		};
+	})();
 })();
 
-Namespace("App.Ajax");
 (function ($, ns) {
 	function hasHandler(handlers, code) {
-		return handlers && code && handlers.hasOwnProperty(code);
-	}
-
+		return handlers && 
+			code && 
+			handlers.hasOwnProperty(code) && 
+			KL.Helpers.isFunction(handlers[code]);
+	}	
+	function tryParseJson(str){
+		try{
+			return $.parseJSON(str);
+		} catch(e) {
+			KL.Logger.error('JSON parse error:', e);
+			return false;
+		}
+	}	
+	function fatal(handlers){
+		var name = 'fatal';
+		if(hasHandler(handlers, name)){
+			handlers[name]();
+			return true;
+		}
+		return false;
+	}	
 	ns.post = function(url, data, handlers) {
 		$.ajax({
 			url: url,
@@ -136,22 +185,21 @@ Namespace("App.Ajax");
 			contentType: false,
 			processData: false,
 			success: function(data, textStatus, jqXhr) {
-				App.Logger.info('ajax', url, textStatus);
-				var result = $.parseJSON(data);
+				KL.Logger.info('ajax', url, textStatus);
+				var result = tryParseJson(data);
 				if (result && hasHandler(handlers, result.code)) {
 					handlers[result.code](result.data);
 				} else {
-					App.Logger.error('Ajax handler', result.code, 'not found', jqXhr);
+					KL.Logger.error('Ajax handler', result.code, 'not found', jqXhr);
+					fatal(handlers);
 				}
 			},
 			error: function(jqXhr, textStatus, errorThrown) {
-				App.Logger.error('Ajax error:', errorThrown);
-				if (hasHandler(handlers, 'fatal')) {
-					handlers['fatal']();
-				} else {
-					App.Logger.error('Ajax fatal handler not found', textStatus, errorThrown, jqXhr);
+				KL.Logger.error('Ajax error:', errorThrown);
+				if (!fatal(handlers)) {
+					KL.Logger.error('Ajax fatal handler not found', textStatus, errorThrown, jqXhr);
 				}
 			}
 		});
 	};
-})(jQuery, App.Ajax);
+})(jQuery, Namespace("KL.Ajax"));
