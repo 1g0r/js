@@ -61,6 +61,24 @@
 		}
 		return this;
 	};
+	
+	EnumerableArr.prototype.count = function() {
+		var count = 0;
+		while(this.next()){
+			count++;
+		}
+		return count;
+	};
+	
+	EnumerableArr.prototype.any = function(fn){
+		var me = typeof fn === 'function' ?
+			new EnumerableWhere(this, fn) :
+			this;
+		while(me.next()){
+			return true;
+		}
+		return false;
+	};
 
 	EnumerableWhere.prototype = Object.create(EnumerableArr.prototype);
 	EnumerableSelect.prototype = Object.create(EnumerableArr.prototype);
@@ -68,5 +86,17 @@
 	//API entry point
 	Array.prototype.linq = function(){
 		return new EnumerableArr(this);
-	}
+	};
+	
+	Array.prototype.where = function(fn){
+		return this.linq().where(fn);
+	};
+	
+	Array.prototype.select = function(fn){
+		return this.linq().select(fn);
+	};
+	
+	Array.prototype.any = function (fn) {
+		return this.linq().any(fn);
+	};
 })();
