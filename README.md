@@ -11,5 +11,5 @@ To use linq simply call linq method against an array:
   .toArray() // result is [6, 7, 8, 9]
 ```
 Supported methods:
-  .where(fn) - fn predecate
-  .select(fn) - fn factory function that creates new item.
+  * .where(fn) - fn predecate
+  * .select(fn) - fn factory function that creates new item.
