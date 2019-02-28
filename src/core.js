@@ -96,4 +96,52 @@
 	setDefaultsDef(Number.prototype);
 	setDefaultsDef(Function.prototype);
 	setDefaultsDef(Array.prototype);
-})(window);
+	
+	// String
+	defineProp('format')(function () {
+		if (arguments.length === 0) {
+			return this;
+		}
+		var args = [].slice.call(arguments);
+		if (args.length === 1 && args[0].isArray()) {
+			args = args[0];
+		}
+		var result = this;
+		args.forEach(function (item, i) {
+			var regex = new RegExp('\\{' + i + '\\}');
+			result = result.replace(regex, item.toString());
+		});
+		return result;
+	})(String.prototype);
+
+	defineProp('isEmpty')(function () {
+		return this.length === 0;
+	})(String.prototype);
+
+	defineProp('fromUtc')(function () {
+		if (!this.endsWith('Z')) {
+			return new Date(this + "Z");
+		}
+		return new Date(this);
+	})(String.prototype);
+
+	// Array
+	defineProp('isEmpty')(function () {
+		return this.length === 0;
+	})(Array.prototype);
+
+	defineProp('delete')(function (func) {
+		if (!func && !func.isFunction() || this.isEmpty()) {
+			return this;
+		}
+		for (var i = 0, item; (item = this[i]); ++i) {
+			if (func(item) === true) {
+				this.splice(i, 1);
+				break;
+			}
+		}
+		return this;
+	})(Array.prototype);
+})(
+	window
+);
