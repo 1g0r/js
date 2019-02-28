@@ -1,6 +1,6 @@
 'use strict';
-(function (d) {
-	Namespace('App').HtmlBuilder = {
+(function (d, app) {
+	app.HtmlBuilder = {
 		div: function (attrs) {
 			return new Div(attrs);
 		},
@@ -49,7 +49,12 @@
 					el.style[x]= style[x];
 				})
 			}
-		} 
+		},
+		'click': function(el, fn){
+			if(fn && fn.isFunction()){
+				el.addEventListener('click', fn);
+			}
+		}
     };
 
 	// ELEMENT
@@ -143,5 +148,6 @@
 	}
 
 })(
-	document
+	document,
+	Namespace('App')
 );
