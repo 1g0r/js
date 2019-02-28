@@ -1,6 +1,6 @@
 'use strict';
 (function (d) {
-	Namespace('Mindscan').HtmlBuilder = {
+	Namespace('App').HtmlBuilder = {
 		div: function (attrs) {
 			return new Div(attrs);
 		},
