@@ -81,15 +81,17 @@
 			});
 		}
 
-		var oldDisplay = false;
+		var oldDisplay = '';
 		this.show = function(){
 			this.el.style.display = oldDisplay;
 			return this;
 		};
 
 		this.hide = function(){
-			oldDisplay = this.el.style.display;
-			this.el.style.display = 'none';
+			if (this.el.style.display !== 'none') {
+				oldDisplay = this.el.style.display;
+				this.el.style.display = 'none';
+			}
 			return this;
 		};
 	}
