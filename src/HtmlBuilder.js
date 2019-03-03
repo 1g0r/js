@@ -51,6 +51,18 @@
 
 		span: function (attrs) {
 			return new Element('span', attrs || {});
+		},
+
+		ul: function (attrs) {
+			return new Element('ul', attrs || {});
+		},
+
+		li: function (attrs) {
+			return new Element('li', attrs || {});
+		},
+
+		a: function (attrs) {
+			return new Element('a', attrs || {});
 		}
 	};
 
@@ -137,7 +149,7 @@
 	}
 
 	Element.prototype.val = function (value) {
-		if (value && value.isString()) {
+		if ((value || value === '') && value.isString()) {
 			this.el.value = value;
 			return this;
 		}
