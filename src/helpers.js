@@ -174,9 +174,7 @@
 			return str.join("&");
 		}
 	};
-})(
-	Namespace("App.Helpers")
-);
+})(Namespace("App.Helpers"));
 
 (function (help) {
 	var queue = [];
@@ -212,9 +210,7 @@
 		});
 	}
 
-})(
-	Namespace("App.Helpers")
-);
+})(Namespace("App.Helpers"));
 
 (function (help) {
 	var fakeTextAerea = document.createElement('textarea');
