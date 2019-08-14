@@ -1,29 +1,7 @@
-'use strict';
+"use strict";
 
-(function(w){
-    function buildNamespace(obj, tail) {
-        var name = tail.shift();
-        if (name) {
-            if (!obj[name]) {
-                obj[name] = {}
-            }
-            buildNamespace.call(obj[name], obj[name], tail);
-        } else {
-            buildNamespace.last = this;
-        }
-    }
-
-    w.Namespace = function(name){
-        if (typeof name === "string" && name.length > 0) {
-            buildNamespace(w, name.split('.'));
-            return buildNamespace.last;
-        }
-        return {};
-    };
-})(window);
-
-(function(w){
-    function defineProp(name) {
+(function (hel) {
+	function defineProp(name) {
 		return function(fn) {
 			return function(obj) {
 				Object.defineProperty(obj, name, {
@@ -53,6 +31,16 @@
 	isStringFalse(Number.prototype);
 	isStringFalse(Array.prototype);
 	isStringFalse(Boolean.prototype);
+
+	// isNumber
+	var isNumber = defineProp('isNumber');
+	isNumber(function () { return true; })(Number.prototype);
+	var isNumberFalse = isNumber(function () { return false; });
+	isNumberFalse(Function.prototype);
+	isNumberFalse(Object.prototype);
+	isNumberFalse(String.prototype);
+	isNumberFalse(Array.prototype);
+	isNumberFalse(Boolean.prototype);
 
 	// isFunction
 	var isFunction = defineProp('isFunction');
@@ -97,7 +85,7 @@
 	setDefaultsDef(Number.prototype);
 	setDefaultsDef(Function.prototype);
 	setDefaultsDef(Array.prototype);
-	
+
 	// String
 	defineProp('format')(function () {
 		if (arguments.length === 0) {
@@ -127,6 +115,17 @@
 	})(String.prototype);
 
 	// Array
+	defineProp('foreach')(function (action) {
+		if (action && action.isFunction()) {
+			for (var i = 0, item; (item = this[i]); ++i) {
+				if (action(item) === false) {
+					break;
+				}
+			}
+		}
+		return this;
+	})(Array.prototype);
+
 	defineProp('isEmpty')(function () {
 		return this.length === 0;
 	})(Array.prototype);
@@ -143,6 +142,109 @@
 		}
 		return this;
 	})(Array.prototype);
+
+	////////
+	hel.to$ = function (el) {
+		if (el instanceof jQuery) {
+			return el;
+		}
+		return $(el);
+	};
+	hel.guid = function () {
+		function s4() {
+			return Math.floor((1 + Math.random()) * 0x10000)
+				.toString(16)
+				.substring(1);
+		}
+		return s4() + s4() + s4() + s4() + s4() + s4() + s4() + s4();
+	};
+	hel.toArray = function () {
+		if (arguments.length === 0) {
+			return null;
+		}
+		return [].slice.call(arguments);
+	};
+	hel.serialize = function (obj) {
+		if (hel.isObject(obj)) {
+			var str = [];
+			for (var p in obj)
+				if (obj.hasOwnProperty(p) && obj[p]) {
+					str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p] + ''));
+				}
+			return str.join("&");
+		}
+	};
 })(
-	window
+	Namespace("App.Helpers")
+);
+
+(function (help) {
+	var queue = [];
+	var isBussy = false;
+
+
+	var invoke = function (n) {
+		setTimeout(function () {
+			n.func();
+			n.resolve();
+			next();
+		}, n.time);
+	};
+
+	var next = function () {
+		var n = queue.shift();
+		if (n) {
+			isBussy = true;
+			invoke(n);
+		} else {
+			isBussy = false;
+		}
+	};
+
+
+
+	help.chainTimeout = function (func, duration) {
+		return new Promise(function (onResolve, onReject) {
+			queue.push({ func: func, time: duration, resolve: onResolve });
+			if (!isBussy) {
+				next();
+			}
+		});
+	}
+
+})(
+	Namespace("App.Helpers")
+);
+
+(function (help) {
+	var fakeTextAerea = document.createElement('textarea');
+	fakeTextAerea.style.position = 'fixed';
+	fakeTextAerea.style.top = 0;
+	fakeTextAerea.style.left = 0;
+	fakeTextAerea.style.width = '2em';
+	fakeTextAerea.style.height = '2em';
+	fakeTextAerea.style.padding = 0;
+	fakeTextAerea.style.border = 'none';
+	fakeTextAerea.style.outline = 'none';
+	fakeTextAerea.style.boxShadow = 'none';
+	fakeTextAerea.style.background = 'transparent';
+	document.body.appendChild(fakeTextAerea);
+
+	help.toClipboard = function (text) {
+		if (!text.isString() || text.isEmpty()) {
+			return;
+		}
+		try {
+			fakeTextAerea.value = text;
+			fakeTextAerea.select();
+			var successful = document.execCommand('copy');
+			var msg = successful ? 'successful' : 'unsuccessful';
+			console.log('Copying text command was ' + msg);
+		} catch (err) {
+			console.log('Oops, unable to copy');
+		}
+	}
+
+})(
+	Namespace("App.Helpers")
 );
