@@ -1,108 +1,138 @@
 'use strict';
-(function (d, app, $) {
-	app.HtmlBuilder = {
-		div: function (attrs) {
-			return new Div(attrs);
-		},
+(function (d) {
+	Object.defineProperty(window, '$$', {
+		enumerable: false,
+		value: new HtmlBuilder()
+	});
 
-		form: function (attrs) {
-			return new Form(attrs || {});
-		},
+	function HtmlBuilder() {
+		return {
+			div: function (attr) {
+				return new $$Element('div', attr || {});
+			},
 
-		label: function (attrs) {
-			return new Label(attrs || {});
-		},
+			form: function (attr) {
+				return new $$Element('form', attr || {});
+			},
 
-		input: function (attrs) {
-			return new Input(attrs || {});
-		},
+			label: function (attr) {
+				return new $$Element('label', attr || {});
+			},
 
-		textarea: function (attrs) {
-			return new Textarea(attrs || {});
-		},
+			input: function (attr) {
+				return new Input(attr || {});
+			},
 
-		button: function (attrs) {
-			return new Button(attrs || {});
-		},
+			textarea: function (attr) {
+				return new $$Element('textarea', attr || {});
+			},
 
-		table: function (attrs) {
-			return new Table(attrs || {});
-		},
+			button: function (attr) {
+				return new $$Element('button', attr || {});
+			},
 
-		thead: function (attrs) {
-			return new Element('thead', attrs || {});
-		},
+			table: function (attr) {
+				return new $$Element('table', attr || {});
+			},
 
-		tbody: function (attrs) {
-			return new Element('tbody', attrs || {});
-		},
+			thead: function (attr) {
+				return new $$Element('thead', attr || {});
+			},
 
-		tr: function (attrs) {
-			return new Element('tr', attrs || {});
-		},
+			tbody: function (attr) {
+				return new $$Element('tbody', attr || {});
+			},
 
-		th: function (attrs) {
-			return new Element('th', attrs || {});
-		},
+			tr: function (attr) {
+				return new $$Element('tr', attr || {});
+			},
 
-		td: function (attrs) {
-			return new Element('td', attrs || {});
-		},
+			th: function (attr) {
+				return new $$Element('th', attr || {});
+			},
 
-		span: function (attrs) {
-			return new Element('span', attrs || {});
-		},
+			td: function (attr) {
+				return new $$Element('td', attr || {});
+			},
 
-		ul: function (attrs) {
-			return new Element('ul', attrs || {});
-		},
+			span: function (attr) {
+				return new $$Element('span', attr || {});
+			},
 
-		li: function (attrs) {
-			return new Element('li', attrs || {});
-		},
+			ul: function (attr) {
+				return new $$Element('ul', attr || {});
+			},
 
-		a: function (attrs) {
-			return new Element('a', attrs || {});
-		}
-	};
+			li: function (attr) {
+				return new $$Element('li', attr || {});
+			},
 
+			a: function (attr) {
+				return new $$Element('a', attr || {});
+			},
+
+			select: function (attr) {
+				return new $$Element('select', attr || {});
+			},
+
+			option: function (attr) {
+				return new $$Element('option', attr || {});
+			},
+
+			img: function (attr) {
+				return new $$Element('img', attr || {});
+			},
+
+			pre: function (attr) {
+				return new $$Element('pre', attr || {});
+			}
+		};
+	}
 
 	var attributeSetters = {
-		'children': function (el, arr) {
+		'children': function (element, arr) {
 			if (!arr.isArray()) {
 				return;
 			}
+			if (arr.length > 1) {
+				element.children = arr;
+			}
 			arr.forEach(child => {
-				if (child.isObject() && child.el) {
-					el.appendChild(child.el);
+				if (child.isObject()) {
+					element.el.appendChild(child.el || child);
 				}
 			});
 		},
-		'text': function (el, value) {
-			if (value.isString()) {
-				el.innerText = value;
+		'text': function (element, value) {
+			if (value !== null && value !== undefined) {
+				element.el.innerText = value.toString();
 			}
 		},
-		'style': function (el, style) {
+		'style': function (element, style) {
 			if (style && style.isObject()) {
 				Object.keys(style).forEach(function (x) {
-					el.style[x] = style[x];
+					element.el.style[x] = style[x];
 				});
 			}
 		},
-		'click': function (el, fn) {
+		'click': function (element, fn) {
 			if (fn && fn.isFunction()) {
-				el.addEventListener('click', fn);
+				element.el.addEventListener('click', function (e) { fn.call(element, e); });
+			}
+		},
+		'change': function (element, fn) {
+			if (fn && fn.isFunction()) {
+				element.el.addEventListener('change', function (e) { fn.call(element, e) });
 			}
 		}
 	};
 
-	// ELEMENT
-	function Element(tagName, attrs) {
-		var el = d.createElement(tagName);
-		this.foo = '';
+	// $$ELEMENT
+	function $$Element(tagName, props) {
+		var self = this;
 
-		Object.defineProperty(this, 'el', {
+		var el = d.createElement(tagName);
+		Object.defineProperty(self, 'el', {
 			enumerable: false,
 			configurable: false,
 			get: function () {
@@ -110,131 +140,177 @@
 			}
 		});
 
-		if (attrs.isObject()) {
-			Object.keys(attrs).forEach(function (name) {
-				if (attributeSetters[name]) {
-					attributeSetters[name](el, attrs[name]);
+		Object.defineProperty(self, '_hidden', {
+			enumerable: false,
+			configurable: false,
+			writable: true,
+			value: false
+		});
+
+		Object.defineProperty(self, '_oldDisplay', {
+			enumerable: false,
+			configurable: false,
+			writable: true,
+			value: ''
+		});
+
+		Object.keys(props).forEach(function (propName) {
+			var prop = props[propName];
+			if (propName === 'skip') {
+				self.skip = prop;
+			} else if (prop instanceof $$Element) {
+				if (prop.skip) {
+					moveProps(self, prop)
 				} else {
-					el.setAttribute(name, attrs[name]);
+					self[propName] = prop;
 				}
-				delete attrs[name];
+				self.append(prop);
+			} else if (attributeSetters[propName]) {
+				attributeSetters[propName](self, prop);
+			} else {
+				el.setAttribute(propName, prop);
+			}
+		});
+
+		function moveProps(parent, obj) {
+			Object.keys(obj).forEach(function (propName) {
+				var prop = obj[propName];
+				if (prop instanceof $$Element) {
+					parent[propName] = prop;
+				}
 			});
 		}
-
-		var oldDisplay = '';
-		this.show = function () {
-			this.el.style.display = oldDisplay;
-			return this;
-		};
-
-		this.hide = function () {
-			if (this.el.style.display !== 'none') {
-				oldDisplay = this.el.style.display;
-				this.el.style.display = 'none';
-			}
-			return this;
-		};
 	}
 
-	Element.prototype.appendTo = function (container) {
-		container.appendChild(this.el);
+	$$Element.prototype.show = function () {
+		this.el.style.display = this._oldDisplay;
+		this._hidden = false;
 		return this;
 	};
 
-	Element.prototype.append = function () {
+	$$Element.prototype.hide = function () {
+		if (this.el.style.display !== 'none') {
+			this._hidden = true;
+			this._oldDisplay = this.el.style.display;
+			this.el.style.display = 'none';
+		}
+		return this;
+	};
+
+	$$Element.prototype.toggle = function () {
+		if (this._hidden) {
+			this.show();
+		} else {
+			this.hide();
+		}
+	};
+
+	$$Element.prototype.appendTo = function (container) {
+		if (container.appendChild) {
+			container.appendChild(this.el);
+		} else if (container.append) {
+			container.append(this.el);
+		}
+		return this;
+	};
+
+	$$Element.prototype.append = function () {
 		if (arguments.length > 0) {
-			attributeSetters.children(this.el, [].slice.call(arguments));
+			attributeSetters.children(
+				this,
+				[].slice.call(arguments).where(function (x) { return !!x; }).toArray()
+			);
 		}
 		return this;
 	}
 
-	Element.prototype.val = function (value) {
-		if ((value || value === '') && value.isString()) {
-			this.el.value = value;
+	$$Element.prototype.val = function (value) {
+		if (typeof value === 'boolean' || value || value === '') {
+			this.el.value = value + '';
 			return this;
+		} else {
+			var result = this.el.value;
+			return (result === null || result === undefined) ? '' : result + '';
 		}
-		return this.el.value;
 	};
 
-	Element.prototype.click = function (fn) {
-		if (fn.isFunction()) {
-			this.el.addEventListener('click', fn);
-		}
+	$$Element.prototype.click = function (fn) {
+		attributeSetters.click(this, fn);
 		return this;
 	}
 
-	Element.prototype.text = function (value) {
-		if (value && value.isString()) {
-			this.el.innerText = value;
-		}
+	$$Element.prototype.change = function (fn) {
+		attributeSetters.change(this, fn);
+		return this;
 	}
 
-	Element.prototype.get$ = function () {
+	$$Element.prototype.text = function (value) {
+		attributeSetters.text(this, value);
+		return this;
+	}
+
+	$$Element.prototype.get$ = function () {
 		return $(this.el);
 	}
 
-	Element.prototype.removeClass = function (name) {
+	$$Element.prototype.removeClass = function (name) {
 		if (name && name.isString()) {
 			this.el.classList.remove(name);
 		}
 		return this;
 	}
 
-	Element.prototype.addClass = function (name) {
+	$$Element.prototype.addClass = function (name) {
 		if (name && name.isString()) {
 			this.el.classList.add(name);
 		}
 		return this;
 	}
 
-	Element.prototype.to = function (obj, name) {
-		if (obj && obj.isObject()) {
-			if (name && name.isString()) {
-				obj[name] = this;
-			}
+	$$Element.prototype.empty = function () {
+		this.el.innerHTML = '';
+		return this;
+	};
+
+	$$Element.prototype.attr = function (name) {
+		if (name && name.isString()) {
+			return this.el.getAttribute(name);
 		}
+		return '';
+	}
+
+	$$Element.prototype.scrollTop = function (val) {
+		this.el.scrollTo(0, 0);
 		return this;
 	}
 
-	function Div(attrs) {
-		Object.setPrototypeOf(this, new Element('div', attrs));
+	$$Element.prototype.focus = function () {
+		this.el.focus();
+		return this;
 	}
 
-	function Form(attrs) {
-		Object.setPrototypeOf(this, new Element('form', attrs));
+	$$Element.prototype.html = function (html) {
+		this.el.innerHTML = html;
+		return this;
 	}
 
-	function Label(attrs) {
-		Object.setPrototypeOf(this, new Element('label', attrs));
+	$$Element.prototype.disable = function () {
+		this.el.disabled = true;
+		return this;
 	}
+
+	$$Element.prototype.enable = function () {
+		this.el.disabled = false;
+		return this;
+	}
+
 
 	function Input(attrs) {
 		attrs = attrs.setDefaults({
 			type: 'text'
 		});
-		Object.setPrototypeOf(this, new Element('input', attrs));
+		Object.setPrototypeOf(this, new $$Element('input', attrs));
 	}
-
-	function Textarea(attrs) {
-		Object.setPrototypeOf(this, new Element('textarea', attrs));
-	}
-
-	function Button(attrs) {
-		Object.setPrototypeOf(this, new Element('button', attrs));
-	}
-
-	function Table(attrs) {
-		Object.setPrototypeOf(this, new Element('table', attrs));
-	}
-
-	Table.prototype.thead = function (attrs) {
-		var thead = new Element('thead', attrs);
-		this.append(thead);
-		return thead;
-	}
-
 })(
-	document,
-	Namespace('App'),
-	jQuery
+	document
 );
