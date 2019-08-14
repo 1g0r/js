@@ -20,7 +20,7 @@
 			},
 
 			input: function (attr) {
-				return new Input(attr || {});
+				return new $$Element('input', attr || {});
 			},
 
 			textarea: function (attr) {
@@ -278,40 +278,32 @@
 			return this.el.getAttribute(name);
 		}
 		return '';
-	}
+	};
 
 	$$Element.prototype.scrollTop = function (val) {
 		this.el.scrollTo(0, 0);
 		return this;
-	}
+	};
 
 	$$Element.prototype.focus = function () {
 		this.el.focus();
 		return this;
-	}
+	};
 
 	$$Element.prototype.html = function (html) {
 		this.el.innerHTML = html;
 		return this;
-	}
+	};
 
 	$$Element.prototype.disable = function () {
 		this.el.disabled = true;
 		return this;
-	}
+	};
 
 	$$Element.prototype.enable = function () {
 		this.el.disabled = false;
 		return this;
-	}
-
-
-	function Input(attrs) {
-		attrs = attrs.setDefaults({
-			type: 'text'
-		});
-		Object.setPrototypeOf(this, new $$Element('input', attrs));
-	}
+	};
 })(
 	document
 );
