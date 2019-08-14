@@ -156,13 +156,14 @@
 
 		Object.keys(props).forEach(function (propName) {
 			var prop = props[propName];
-			if (propName === 'skip') {
-				self.skip = prop;
+			if (propName === 'store') {
+				self.store = prop;
 			} else if (prop instanceof $$Element) {
-				if (prop.skip) {
-					moveProps(self, prop)
-				} else {
+				if (prop.store) {
 					self[propName] = prop;
+					delete prop.store;
+				} else {
+					moveProps(self, prop);
 				}
 				self.append(prop);
 			} else if (attributeSetters[propName]) {
