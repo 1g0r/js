@@ -102,7 +102,7 @@
 		});
 		return result;
 	})(String.prototype);
-	
+
 	defineProp('isEmpty')(function () {
 		return this.length === 0;
 	})(String.prototype);
@@ -113,7 +113,7 @@
 		}
 		return new Date(this);
 	})(String.prototype);
-	
+
 	defineProp('softHyphen')(function() {
 		var res = '';
 		for (var i = 0, l = this.length; i < l; ++i) {
