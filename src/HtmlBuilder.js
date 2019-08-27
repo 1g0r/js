@@ -268,6 +268,13 @@
 		return this;
 	}
 
+	$$Element.prototype.toggleClass = function (name) {
+		if (name && name.isString()) {
+			this.el.classList.toggle(name);
+		}
+		return this;
+	}
+
 	$$Element.prototype.empty = function () {
 		this.el.innerHTML = '';
 		return this;
