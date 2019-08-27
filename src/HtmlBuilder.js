@@ -85,6 +85,22 @@
 
 			pre: function (attr) {
 				return new $$Element('pre', attr || {});
+			},
+
+			h1: function(attr){
+				return new $$Element('h1', attr || {});
+			},
+
+			h2: function(attr){
+				return new $$Element('h2', attr || {});
+			},
+
+			h3: function(attr){
+				return new $$Element('h3', attr || {});
+			},
+
+			h4: function(attr){
+				return new $$Element('h4', attr || {});
 			}
 		};
 	}
