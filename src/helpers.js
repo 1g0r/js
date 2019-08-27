@@ -113,6 +113,14 @@
 		}
 		return new Date(this);
 	})(String.prototype);
+	
+	defineProp('softHyphen')(function() {
+		var res = '';
+		for (var i = 0, l = this.length; i < l; ++i) {
+			res += this[i] + '\u00ad';
+		}
+		return res;
+	})(String.prototype);
 
 	// Array
 	defineProp('foreach')(function (action) {
