@@ -42,6 +42,16 @@
 	isNumberFalse(Array.prototype);
 	isNumberFalse(Boolean.prototype);
 
+	// isBoolean
+	var isBoolean = defineProp('isBoolean');
+	isBoolean(function () { return true; })(Boolean.prototype);
+	var isBooleanFalse = isBoolean(function () { return false; });
+	isBooleanFalse(Function.prototype);
+	isBooleanFalse(Object.prototype);
+	isBooleanFalse(String.prototype);
+	isBooleanFalse(Array.prototype);
+	isBooleanFalse(Number.prototype);
+
 	// isFunction
 	var isFunction = defineProp('isFunction');
 	isFunction(function () { return true; })(Function.prototype);
