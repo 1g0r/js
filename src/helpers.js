@@ -102,7 +102,7 @@
 		});
 		return result;
 	})(String.prototype);
-
+	
 	defineProp('isEmpty')(function () {
 		return this.length === 0;
 	})(String.prototype);
