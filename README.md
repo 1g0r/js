@@ -13,3 +13,30 @@ To use linq simply call linq method against an array:
 Supported methods:
   * .where(fn) - fn predecate
   * .select(fn) - fn factory function that creates new item.
+
+# htmlBuilder
+It's simple library for building dynamic HTML markup written on native JavaScript.
+Main goal is to use only natine JavaScript in library itself and in clients that uses it. 
+To describe HTML elements library uses native object literals. For instance to create table element simply call "table" method like this:
+```javascript
+var tableView = $$.table({
+  'class': 'class-name-goes-here',
+  head: $$.thead({
+    store: true,
+    'class': 'class-name-for-header',
+    nameColumn: $$.th({ store: true, ... }),
+    ageColumn: $$.th({ store: true, ... })
+    dateColumn: $$.th({ })
+  })
+});
+```
+then you can access elements with dot notation:
+```javascript
+tableView.head.NameColumn.addClass('selected').
+```
+Note that to store elements in parent object one should use "store" property with value of true. As in example above dateColumn will not be accessibble in head object because it's object literal does not set "store" property value to true.
+Library supports all native properties and event of the DOM elements and defines is's own methods:
+* show
+* hide
+* click
+* to be continued...
