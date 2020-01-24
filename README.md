@@ -32,10 +32,10 @@ var tableView = $$.table({
 ```
 then you can access elements with dot notation:
 ```javascript
-tableView.head.NameColumn.addClass('selected').
+tableView.head.nameColumn.addClass('selected').
 ```
 Note that to store elements in parent object one should use "store" property with value of true. As in example above dateColumn will not be accessibble in head object because it's object literal does not set "store" property value to true.
-Library supports all native properties and event of the DOM elements and defines is's own methods:
+Library supports all native properties and events of the DOM elements and defines is's own methods:
 * show
 * hide
 * click
