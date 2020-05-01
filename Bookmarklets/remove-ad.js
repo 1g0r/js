@@ -11,3 +11,9 @@ iframe:not([allowfullscreen]), \
     els.forEach(e => e.remove());
     alert(els.length + ' elements was deleted!');
 })();
+
+
+
+
+
+
