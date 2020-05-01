@@ -10,4 +10,4 @@ iframe:not([allowfullscreen]), \
     var els = document.querySelectorAll(selector);
     els.forEach(e => e.remove());
     alert(els.length + ' elements was deleted!');
-})()
+})();
