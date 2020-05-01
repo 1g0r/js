@@ -7,5 +7,7 @@
 iframe:not([allowfullscreen]), \
 .pagelet, \
 .sideColumn';
-    document.querySelectorAll(selector).forEach(e => e.remove());
+    var els = document.querySelectorAll(selector);
+    els.forEach(e => e.remove());
+    alert('Deleted ' + els.length + ' elements!');
 })()
