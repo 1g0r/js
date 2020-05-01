@@ -9,11 +9,5 @@ iframe:not([allowfullscreen]), \
 .sideColumn';
     var els = document.querySelectorAll(selector);
     els.forEach(e => e.remove());
-    alert(els.length + ' elements was deleted!');
+    alert(els.length + ' elements is deleted!');
 })();
-
-
-
-
-
-
