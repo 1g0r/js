@@ -1,0 +1,1 @@
+javascript:(function(x){u = 'https://raw.githubusercontent.com/1g0r/jsLib/master/Bookmarklets/remove-ad.js';c = function(){eval(this.responseText)};x.addEventListener("load", c);x.open("GET", u + '?v=' + parseInt(Math.random()*99999999), true);x.send();})(new XMLHttpRequest())
