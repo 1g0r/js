@@ -101,6 +101,10 @@
 
 			h4: function(attr){
 				return new $$Element('h4', attr || {});
+			},
+			
+			canvas: function(attr){
+				return new SSElement('canvas', attr || {});
 			}
 		};
 	}
