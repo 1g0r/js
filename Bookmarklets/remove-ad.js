@@ -6,6 +6,7 @@
 [class*="banner"], \
 iframe:not([allowfullscreen]), \
 .pagelet, \
+iframe[src*="googleapis"], \
 .sideColumn';
     var els = document.querySelectorAll(selector);
     els.forEach(e => e.remove());
