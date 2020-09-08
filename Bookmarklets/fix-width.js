@@ -5,7 +5,7 @@
         var body = d.querySelector('body');
         body.style.display = 'flex';
         body.style.flexDirection = 'column';
-        body.style.justifyContent = 'center';
+        body.style.alignItems = 'center';
         body.innerHTML = '';
         elements.forEach(e => {
             e.style.width = '100%';
