@@ -1,5 +1,5 @@
 (function(d){
-    var selector = '.article__content';
+    var selector = '.article__content,.b-topic__content';
     var elements = d.querySelectorAll(selector) || [];
     if(elements.length > 0){
         var body = d.querySelector('body');
