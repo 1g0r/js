@@ -1,14 +1,20 @@
 (function(){
+    var count = 0;
     var selector = '.__brand_top_2889, \
 #mlph2889, \
 [class^="sidebar"]:not(html), \
 #fishki-video-frame-wrapper, \
 [class*="banner"], \
-iframe:not([allowfullscreen]), \
+iframe,\
 .pagelet, \
 iframe[src*="googleapis"], \
 .sideColumn';
     var els = document.querySelectorAll(selector);
-    els.forEach(e => e.remove());
-    alert(els.length + ' elements have been deleted!');
+    els.forEach(e => {
+        if(!(e.src && e.src.length && e.src.length > 0)) {
+            count++;
+            e.remove();
+        }
+    });
+    alert(count + ' elements have been deleted!');
 })();
