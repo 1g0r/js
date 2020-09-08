@@ -1,1 +1,1 @@
-javascript:(function(x,u){x.addEventListener("load",function(){eval(this.responseText)});x.open("GET",u+'?v='+parseInt(Math.random()*99999999),true);x.send();})(newXMLHttpRequest(),'https://raw.githubusercontent.com/1g0r/jsLib/master/Bookmarklets/fix-link.js')
+javascript:(function(x,u){x.addEventListener("load",function(){eval(this.responseText)});x.open("GET",u+'?v='+parseInt(Math.random()*99999999),true);x.send();})(new XMLHttpRequest(),'https://raw.githubusercontent.com/1g0r/jsLib/master/Bookmarklets/fix-link.js')
