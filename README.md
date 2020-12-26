@@ -16,7 +16,7 @@ Supported methods:
 
 # htmlBuilder
 It's simple library for building dynamic HTML markup written on native JavaScript.
-Main goal is to use only natine JavaScript in library itself and in clients that uses it. 
+Main goal is to use only native JavaScript in library itself and in clients that use it. 
 To describe HTML elements library uses native object literals. For instance to create table element simply call "table" method like this:
 ```javascript
 var tableView = $$.table({
