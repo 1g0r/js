@@ -25,7 +25,7 @@ function send(request, callback) {
 // Without chaining the process described would look like so
 var firstRequest = {
     url: 'auth/token',
-     method: 'POST'
+    method: 'POST'
 }
 send(firstRequest, (request1, response1) => {
     // First handler's code goes here. 
@@ -55,3 +55,50 @@ send(firstRequest, (request1, response1) => {
         });
     });
 });
+
+// instead we can create separate functions performing each step
+// and chain them together in execution order one by one
+// note that there is no naming collisions anymore
+function firstStep(userInput, callback) {
+    var request = {
+        url: 'auth/token',
+        method: 'POST',
+        body: {login: userInput.login, password: userInput.password}
+    };
+
+    send(request, callback);
+}
+
+function secondStep(tokenData, callback) {
+    var request = {
+        url: 'auth/code',
+        method: 'POST',
+        body: {code: '11111', tempToken: tokenData.token}
+    };
+
+    send(request, callback);
+}
+
+function thirdStep(session, callback) {
+    var request = {
+        url: 'auth/activate',
+        method: 'POST',
+        body: {id: session.id}
+    };
+
+    send(request, callback);
+}
+
+function success(session) {
+    Console.log("Session is activated " + session.id);
+}
+
+// building invocation chain
+const activate = chain(
+    firstStep,
+    mapParam(secondStep),
+    mapParam(thirdStep),
+    invoke(success)
+);
+
+activate({login: 'user', password:'password'});
