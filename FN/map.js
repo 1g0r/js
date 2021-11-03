@@ -1,7 +1,8 @@
+// Give names to IIFE to have proper call stack
 var fp = (function fp(library) {
     library.map = function(arr, fn) {
         // Check parameters
-        if (arr == null || !arr.isArray() || arr.length == 0){
+        if (!arr || !arr.isArray() || arr.length == 0){
             return [];
         }
         if (fn == null || !fn.isFunction()) {
@@ -17,4 +18,4 @@ var fp = (function fp(library) {
     };
 
     return library;
-})(fp || {})
+})(fp || {});
