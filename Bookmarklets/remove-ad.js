@@ -8,6 +8,7 @@
 iframe,\
 .pagelet, \
 iframe[src*="googleapis"], \
+.container-slider-top, \
 .sideColumn';
     var els = document.querySelectorAll(selector);
     els.forEach(e => {
