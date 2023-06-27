@@ -32,7 +32,7 @@ var tableView = $$.table({
     store: true,
     'class': 'class-name-for-header',
     nameColumn: $$.th({ store: true, ... }),
-    ageColumn: $$.th({ store: true, ... })
+    ageColumn: $$.th({ store: true, ... }),
     dateColumn: $$.th({ })
   })
 });
