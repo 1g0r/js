@@ -13,10 +13,9 @@
         '.sideColumn'
     ].join(',');
     var els = document.querySelectorAll(selector);
-    alert(els.length + ' elements found')
     els.forEach(e => {
         count++;
         e.remove();
     });
-    alert(count + ' elements have been deleted!');
+    alert(count + ' elements have been deleted out of ' + els.length);
 })();
