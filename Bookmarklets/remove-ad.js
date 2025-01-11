@@ -17,5 +17,5 @@
         count++;
         e.remove();
     });
-    alert(count + ' elements have been deleted out of ' + els.length);
+    alert(count + ' elements have been deleted out of ' + els.length); 
 })();
