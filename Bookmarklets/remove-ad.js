@@ -15,10 +15,10 @@
     var els = document.querySelectorAll(selector);
     alert(els.length + ' elements found')
     els.forEach(e => {
-        if(!(e.src && e.src.length && e.src.length > 0)) {
+        //if(!(e.src && e.src.length && e.src.length > 0)) {
             count++;
             e.remove();
-        }
+        //}
     });
     alert(count + ' elements have been deleted!');
 })();
